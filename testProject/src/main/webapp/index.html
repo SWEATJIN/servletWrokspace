@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사칙연산 계산기</title>
+
+    <!-- 
+      js 에서 모듈 적용시에는 아래와같이 반드시 type 속성을 module 로 지정해야함에 주의.
+   -->
+    <script type="module" defer src="./static/main/index.js"></script>
 </head>
+
 <body>
-<strong>테스트!</strong>
+    <h1>필터를 이용한 한글 설정과 CORS 설정</h1>
+    <hr>
+
+    <form name="dataTrans" method="post">
+        <div>
+            <div>
+                <label for="content">전송 내용 입력 :</label>
+            </div>
+
+            <textarea rows="20" cols="100" name="content" id="content"></textarea>
+        </div>
+
+        <button type="button" name="submitBtn">전송</button>
+    </form>
 </body>
+
 </html>

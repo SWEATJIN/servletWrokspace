@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>사용자 입력폼을 이용한 서블릿 실행</title>
+</head>
+<body>
+   <h1>
+      학생 점수 산출
+   </h1>
+   
+   <!--
+      아래의 경우 index.html 의 물리적 경로가 루트(wepapp) 아래의 mappingTest 가 되므로
+      현재 경로를 기준으로한 상대 경로가 적용(/mappingTest/test4)되어 전송시, /test4 서블릿과
+      맵핑되지 않아 정상적 처리가 되지 않는 것을 확인 가능.
+   -->
+   <form action="test4">
+      <div>
+         <label>
+            학생명 :
+            <input type="text" name="stName"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            국어점수 :
+            <input type="text" name="korSc"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            영어점수 :
+            <input type="text" name="engSc"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            수학점수 :
+            <input type="text" name="mathSc"/>
+         </label>
+      </div>
+      
+      <button>연산 실행</button>
+   </form>
+   <hr>
+   
+   <!--
+      아래의 경우 절대 경로를 지정함으로써, /test4 서블릿과 정상 맵핑 처리 되는 것을 확인 가능.
+   -->
+   <form action="/test4">
+      <div>
+         <label>
+            학생명 :
+            <input type="text" name="stName"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            국어점수 :
+            <input type="text" name="korSc"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            영어점수 :
+            <input type="text" name="engSc"/>
+         </label>
+      </div>
+      <div>
+         <label>
+            수학점수 :
+            <input type="text" name="mathSc"/>
+         </label>
+      </div>
+      
+      <button>연산 실행</button>
+   </form>
+</body>
+</html>
