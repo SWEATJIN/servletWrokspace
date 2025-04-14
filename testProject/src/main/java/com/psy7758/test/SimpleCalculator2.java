@@ -9,26 +9,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/simpleCalculator")
-public class SimpleCalculator extends HttpServlet {
+@WebServlet("/simpleCalculator2")
+public class SimpleCalculator2 extends HttpServlet {
    private static final long serialVersionUID = 1L;
    private static boolean firstInput = true;
-   
+
    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       String num_ = request.getParameter("num");
       String addCookieStr_ = null;
       
       try {
-         if( firstInput ) {
-            String[] possiblePaths = { "/", "/simpleCalculator" };
+         String[] possiblePaths = { "/", "/simpleCalculator2" };
 
-            for (String path : possiblePaths) {
-                Cookie deleteCookie = new Cookie("tot", "");
-                deleteCookie.setPath(path);
-                deleteCookie.setMaxAge(0);
-                response.addCookie(deleteCookie);
-            }
-            
+         for (String path : possiblePaths) {
+             Cookie deleteCookie = new Cookie("tot", "");
+             deleteCookie.setPath(path);
+             deleteCookie.setMaxAge(0);
+             response.addCookie(deleteCookie);
+         }
+         
+         if( firstInput ) {
             if( num_.equals("") ) {
                addCookieStr_ = "0";
             } else {
@@ -55,10 +55,10 @@ public class SimpleCalculator extends HttpServlet {
          
          Cookie cookie = new Cookie("tot", addCookieStr_);
          
-         cookie.setPath("/simpleCalculator");
+         cookie.setPath("/simpleCalculator2");
          response.addCookie(cookie);
       } finally {
-         response.sendRedirect("simpleCalculator/redirectionPage");
+         response.sendRedirect("simpleCalculator2/redirectionPage2");
       }
    }
 }

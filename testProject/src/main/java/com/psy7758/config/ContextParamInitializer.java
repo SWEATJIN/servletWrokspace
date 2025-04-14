@@ -34,8 +34,8 @@ public class ContextParamInitializer implements ServletContextListener {
       context.setInitParameter("mysql_psw", "jhj1217d");
       context.setInitParameter("maria_psw", "jhj1217d");
       
-      context.setInitParameter("react_env", "development");      // 리액트 프로젝트에서 테스트.
-//      context.setInitParameter("react_env", "production");      // 프로젝트 내 배포된 js 기반 HTML 에서 실행 테스트.
+//      context.setInitParameter("react_env", "development");      // 리액트 프로젝트에서 테스트.
+      context.setInitParameter("react_env", "production");      // 프로젝트 내 배포된 js 기반 HTML 에서 실행 테스트.
    }
    
    @Override

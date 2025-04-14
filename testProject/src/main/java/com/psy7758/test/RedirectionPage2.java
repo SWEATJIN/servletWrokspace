@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/simpleCalculator/redirectionPage")
-public class RedirectionPage extends HttpServlet {
+@WebServlet("/simpleCalculator2/redirectionPage2")
+public class RedirectionPage2 extends HttpServlet {
    private static final long serialVersionUID = 1L;
    
    @Override
@@ -33,12 +33,12 @@ public class RedirectionPage extends HttpServlet {
       printWriter.print("<html>");
       printWriter.print("<head>");
       printWriter.print("<meta charset=\"UTF-8\">");
-      printWriter.print("<title>Cookie 의 맵핑 경로에 따른 저장영역 설정 및 추출</title>");
+      printWriter.print("<title>Cookie 의 맵핑 경로에 따른 저장 및 추출 - setPath</title>");
       printWriter.print("</head>");
       printWriter.print("<body>");
-      printWriter.print("   <h1>Cookie 의 맵핑 경로에 따른 저장영역 설정 및 추출</h1>");
+      printWriter.print("   <h1>Cookie 의 맵핑 경로에 따른 저장 및 추출 - setPath</h1>");
       printWriter.print("   <hr>");
-      printWriter.print("   <form action=\"/simpleCalculator\" method=\"post\">");      // 절대 경로로 변경
+      printWriter.print("   <form action=\"/simpleCalculator2\" method=\"post\">");      // 절대 경로로 변경
       printWriter.print("      <div>");
       printWriter.print("         <label>누적합 : ");
       printWriter.printf("            <input type=\"text\" name = \"tot\" disabled=\"disabled\" value = %s>", tot);
