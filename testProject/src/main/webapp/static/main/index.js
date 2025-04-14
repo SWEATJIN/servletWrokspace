@@ -1,19 +1,30 @@
 'use strict';
 
-/* 
-    js 에서 임포트시 경로는 html 기준이 아닌 js 가 기준이됨에 주의.
-    js 에서는 확장자(.js) 생략 불가.
-*/
-import { APP_API_URL } from '../js/config.js';
+const btn = document.querySelector('button'),
+    main = document.querySelector('main');
 
-const { dataTrans } = document,
-    { submitBtn } = dataTrans;
+const client = {
+    name: 'psy',
+    clientNumber: 2,
+    address: '수원시 팔당구',
+	    phoneNumber: '010-1234-5678',
+};
 
-function transData(e) {
-    e.preventDefault();
+async function postClientData() {
+    try {
+        /* 
+            axios 의 post 메서드를 이용함으로써, js 객체를 별도의 변환없이 JSON 형식으로
+         자동 변환하여 전송.
+            post 메서드의 2번째 인자에는 js 객체뿐만아니라, 숫자나 일반 문자열도 전달 가능.
+         단, 이경우 숫자 0 을 전달되는 경우에는 서블릿에서 readLine() 메서드로 읽을 때,
+         null 로 취환되어 수신됨에 주의.
+        */
+        const response = await axios.post('/postJson', client);
 
-    dataTrans.action = `${APP_API_URL}test4`;
-    dataTrans.submit();
+        main.innerHTML = response.data;
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-submitBtn.addEventListener('click', transData);
+btn.addEventListener('click', postClientData);
