@@ -2,27 +2,36 @@
 <html lang="en">
 
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Axios 를 이용한 클라이언트측 JSON 데이터를 서블릿으로 전송</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form 데이터 전송에 대한 JSON 객체를 이용한 CSR 구현 - 포워딩을 통한 경로 문제 해결</title>
 
-   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-   <script defer src="./static/main/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script defer src="./static/main/index.js"></script>
 </head>
 
 <body>
-   <header>
-      <h1>헤더다</h1>
-      <button>main 에 요소 삽입</button>
-   </header>
+    <h1>고객 정보 입력</h1>
 
-   <main>
+    <form name="clientForm">
+        <div>
+            <label>고객명 :
+                <input type="text" name="clientName">
+            </label>
+        </div>
+        <div>
+            <label>고객번호 :
+                <input type="text" name="clientNum">
+            </label>
+        </div>
+        <div>
+            <label>고객주소 :
+                <input type="text" name="clientAddr">
+            </label>
+        </div>
 
-   </main>
-
-   <footer>
-      <h3>푸터다</h3>
-   </footer>
+        <button type="button" name="submitBtn">전송</button>
+    </form>
 </body>
 
 </html>
