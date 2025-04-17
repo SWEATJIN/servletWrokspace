@@ -34,8 +34,14 @@ public class ContextParamInitializer implements ServletContextListener {
       context.setInitParameter("mysql_psw", "jhj1217d");
       context.setInitParameter("maria_psw", "jhj1217d");
       
-//      context.setInitParameter("react_env", "development");      // 리액트 프로젝트에서 테스트.
-      context.setInitParameter("react_env", "production");      // 프로젝트 내 배포된 js 기반 HTML 에서 실행 테스트.
+      context.setInitParameter("react_env", "production");
+//      context.setInitParameter("react_env", "development");
+      
+      // 공지사항 페이지에서 기본적으로 페이징할 레코드 갯수(10)를 초기 파라미터값으로 설정.
+      context.setInitParameter("pagingSizeValue", "10");
+      
+      // 공지사항 페이지에서 페이지 네이션들을 그룹화시킬 페이지 네이션 세트값(5)을 초기 파라미터값으로 설정.
+      context.setInitParameter("pagenationSet", "5");
    }
    
    @Override

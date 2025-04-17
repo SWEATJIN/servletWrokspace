@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
 
+import com.psy7758.context.ServletContextHolder;
 import com.psy7758.dto.Notice;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -15,7 +16,15 @@ import com.zaxxer.hikari.HikariDataSource;
 public abstract class CommonModule implements Dao {
    private static final HikariConfig config = new HikariConfig();
    private static HikariDataSource dataSource;
-
+   
+   /*
+    * 공지사항 페이지에서 기본적으로 페이징할 레코드 갯수(10)를 초기 파라미터를 통해 수신하여 정적 필드값으로 설정.
+    * 개별 DBMS DAO 에서 쿼리시 페이징 사이즈를 알아야 하므로 CommonModule 에서 통합하여 얻도록 설정.
+    */
+   private static int pagingSizeValue = Integer.parseInt(
+         ServletContextHolder.getServletContext().getInitParameter("pagingSizeValue")
+   );
+   
    public CommonModule(ServletContext context, String driver, String url, String user_name, String psw) {
       synchronized (CommonModule.class) {
          if (dataSource == null) {
@@ -30,8 +39,19 @@ public abstract class CommonModule implements Dao {
          }
       }
    }
-
-   public ArrayList<Notice> getNoticesDb(String selectSql, String searchWord) throws SQLException {   // 메서드명 변경.
+   
+   // 공지사항 페이지에서 기본적으로 페이징할 레코드 갯수(10)를 상속 계층에서 얻기 위한 public 메서드 설정.
+   public static int getPagingSizeValue() {
+      /*
+         본래 페이징 사이즈를 구하기 위한 SQL 구문 설정도 PreparedStatement 를 이용하여야 하지만,
+         오라클과 MYSQL/MARIA 에서의 페이징 방법이 다르고, pagingSizeValue 값 자체가  내부 데이터
+         이므로 외부로부터의 보안 문제가 없으므로 getPagingSizeValue 를 통해 개별 DAO 에서 직접
+         연산 및 결합하여 전달.
+      */
+      return pagingSizeValue;
+   }
+   
+   public ArrayList<Notice> getNoticesDb(String selectSql, String searchWord) throws SQLException {
       try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
          preparedStatement.setString(1, "%" + searchWord + "%");
@@ -57,19 +77,7 @@ public abstract class CommonModule implements Dao {
       }
    }
    
-   /*
-    * JDBC 에 모두 호환되는 SQL 이므로 각 JDBC 별 설정이 아닌, 공통 모듈(CommonModule)에서
-    * 하나의 메서드로 통합 처리가 가능하지만, 서비스 계층( AdminService, UserService ) 에서
-    * JDBC 별 통합 수신을 위한 Dao 인터페이스로 참조해야 하는 이유로, 어쩔수 없이 Dao 인터페이스에
-    * 추상 메서드 추가로 인한 각 JDBC 별 오버라이딩 메서드를 추가하고, 해당 메서드에서 공통 모듈의
-    * 당 메서드 호출하여 실행하도록 설정.
-    * 
-    * ※ 단, Notice DTO 객체의 id 필드를 String 으로 전환하면, 상기 getNoticesDb 메서드를
-    *   그대로 재사용 가능하므로, Dao 인터페이스에 추가적인 추상 메서드나 하위 계층 및 서비스 계층에서의
-    *   오버라이딩 메서드가 추가적으로 필요없지만, getNoticesDb 메서드에서 ArrayList<Notice>
-    *   타입으로 반환하므로 실제 사용하는 서비스 계층에서 다시 인덱싱을 해야하는 단점 발생.
-    */
-   public Notice getNoticeDb(int id) throws SQLException {
+   public Notice getCurrentNoticeDb(int id) throws SQLException {         // 메서드명 변경.
       String selectSql = "SELECT * FROM notice WHERE id LIKE ?";
       
       try (Connection connection = dataSource.getConnection();

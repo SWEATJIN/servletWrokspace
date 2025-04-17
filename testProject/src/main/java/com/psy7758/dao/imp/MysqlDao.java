@@ -23,19 +23,20 @@ public class MysqlDao extends CommonModule {
    }
    
    @Override
-   public ArrayList<Notice> getNotices(String searchField, String searchWord, boolean pub) throws SQLException {   // 메서드명 변경.
-      String selectSql = String.format("SELECT @rowNum := @rowNum + 1 num, notice.* "
-            + "FROM notice, ( SELECT @rowNUm := 0 ) rn "
+   public ArrayList<Notice> getNotices(int pageNum, String searchField, String searchWord, boolean pub) throws SQLException {
+      String selectSql = String.format("SELECT * FROM NOTICE "
             + "WHERE %s LIKE ? %s "
-            + "ORDER BY regDate DESC", searchField, pub ? "" : "AND pub = 1");                  // DESC 추가.
+            + "ORDER BY REGDATE DESC "
+            + "LIMIT %d, %d;",
+            searchField, pub ? "" : "AND pub = 1", ( pageNum - 1 ) * getPagingSizeValue(), getPagingSizeValue()
+      );
       
       return getNoticesDb(selectSql, searchWord);
    }
    
-   // 오버라이딩 메서드 추가.
    @Override
-   public Notice getNotice(int id) throws SQLException {
-      return getNoticeDb(id);
+   public Notice getCurrentNotice(int id) throws SQLException {
+      return getCurrentNoticeDb(id);
    }
    
    @Override
