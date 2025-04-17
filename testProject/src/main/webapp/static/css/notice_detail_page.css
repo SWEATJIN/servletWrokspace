@@ -31,6 +31,19 @@
     color: red;
 }
 
+.table .attachedfilesList {
+   display:block;
+}
+
+.table .attachedfilesList a {
+   text-decoration: none;
+}
+
+.table .attachedfilesList a:hover {
+   text-decoration: underline;
+   background-color: rgb(213, 218, 218);
+}
+
 .colorRed {
     color: red;
 }

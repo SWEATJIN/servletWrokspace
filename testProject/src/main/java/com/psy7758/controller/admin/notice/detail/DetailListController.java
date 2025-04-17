@@ -1,4 +1,4 @@
-package com.psy7758.controller.notice.detail;
+package com.psy7758.controller.admin.notice.detail;
 
 import java.io.IOException;
 import java.sql.SQLException;

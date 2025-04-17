@@ -1,6 +1,12 @@
 <%@page import="com.psy7758.service.imp.AdminService"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.psy7758.dto.Notice"%>
+<!-- ================================================================================================== -->
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<!-- ================================================================================================== -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
    
@@ -9,7 +15,7 @@
 
 <head>
    <meta charset="UTF-8">
-   <title>JSP 페이지에 대한 외부 CSS 적용과 서블릿 필터(CharSetServletFilter) 적용시 주의점</title>
+   <title>detail.jsp 페이지의 첨부 파일에 대한 목록 분리와 링크 설정</title>
    
    <link rel="stylesheet" href="/static/css/notice_detail_page.css">
 </head>
@@ -29,8 +35,26 @@
                <div>${noticeModel.writer_id}</div>
                <div>조회수</div>
                <div>${noticeModel.hit}</div>
+               
+               <!-- ====================================================================================================================== -->      
+               
                <div>첨부파일</div>
-               <div>${noticeModel.files}</div>
+               <div class="attachedfilesList">
+                  <c:forTokens var="file" items="${noticeModel.files}" delims="," varStatus="status">
+                          <a href="${file}">
+                              <c:choose>
+                                  <c:when test="${fn:endsWith(file, 'gif')}">${fn:toUpperCase(file)}</c:when>
+                                  <c:otherwise>${file}</c:otherwise>
+                              </c:choose>
+      
+                              <%-- ${fn:endsWith(file, 'gif' ) ? fn:toUpperCase(file) : file} --%>
+                          </a>
+                          ${status.last ? '' : '/ '}
+                       </c:forTokens>
+               </div>
+               
+               <!-- ====================================================================================================================== -->      
+               
                <div>${noticeModel.content}</div>
             </div>
          </div>
