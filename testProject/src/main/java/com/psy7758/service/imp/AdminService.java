@@ -10,7 +10,6 @@ import com.psy7758.dto.Notice;
 import com.psy7758.service.Service;
 
 public class AdminService implements Service{
-//   private Dao dao = new OracleDao();
 //   private Dao dao = new MysqlDao();
    private Dao dao = new MariaDao();
 
@@ -29,6 +28,24 @@ public class AdminService implements Service{
       }
       
       return notices;
+   }
+   
+   @Override
+   public int getNoticeCnt() {
+      return getNoticeCnt("id", "");
+   }
+   
+   @Override
+   public int getNoticeCnt(String searchField, String searchWord) {
+      int noticeCnt = 0;
+      
+      try {
+         noticeCnt = dao.getNoticeCnt(searchField, searchWord, true);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      
+      return noticeCnt;
    }
    
    @Override

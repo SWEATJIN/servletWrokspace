@@ -10,12 +10,11 @@ import com.psy7758.dto.Notice;
 import com.psy7758.service.Service;
 
 public class UserService implements Service{
-//   private Dao dao = new OracleDao();
 //   private Dao dao = new MysqlDao();
    private Dao dao = new MariaDao();
 
    @Override
-   public ArrayList<Notice> getNotices(int pageNum){
+   public ArrayList<Notice> getNotices(int pageNum) {
       return getNotices(pageNum, "id", "");
    }
    
@@ -23,12 +22,30 @@ public class UserService implements Service{
    public ArrayList<Notice> getNotices(int pageNum, String searchField, String searchWord) {
       ArrayList<Notice> notices = null;
       try {
-         notices = dao.getNotices(pageNum, searchField, searchWord, false);
+         notices = dao.getNotices(pageNum, searchField, searchWord, true);
       } catch (SQLException e) {
          e.printStackTrace();
       }
       
       return notices;
+   }
+   
+   @Override
+   public int getNoticeCnt() {
+      return getNoticeCnt("id", "");
+   }
+   
+   @Override
+   public int getNoticeCnt(String searchField, String searchWord) {
+      int noticeCnt = 0;
+      
+      try {
+         noticeCnt = dao.getNoticeCnt(searchField, searchWord, false);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      
+      return noticeCnt;
    }
    
    @Override
@@ -42,5 +59,18 @@ public class UserService implements Service{
       }
       
       return notice;
+   }
+
+   // 관리자에게만 제공되는 기능 - 관리자에만 적용되는 확장 메서드. 
+   public int setPub(String id) {
+      int result = 0;
+      
+      try {
+         result = dao.setPub(id);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return result;
    }
 }

@@ -35,6 +35,14 @@ public class MysqlDao extends CommonModule {
    }
    
    @Override
+   public int getNoticeCnt(String searchField, String searchWord, boolean pub) throws SQLException {
+      String selectSql = String.format("SELECT COUNT(ID) CNT FROM NOTICE WHERE %s LIKE ? %s",
+            searchField, pub ? "" : "AND pub = 1");
+      
+      return getNoticeCntDb(selectSql, searchWord);
+   }
+   
+   @Override
    public Notice getCurrentNotice(int id) throws SQLException {
       return getCurrentNoticeDb(id);
    }
