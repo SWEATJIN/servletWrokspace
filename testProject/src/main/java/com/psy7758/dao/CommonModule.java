@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 
 import com.psy7758.context.ServletContextHolder;
 import com.psy7758.dto.Notice;
+import com.psy7758.dto.view.notice.NoticeView;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -17,10 +18,6 @@ public abstract class CommonModule implements Dao {
    private static final HikariConfig config = new HikariConfig();
    private static HikariDataSource dataSource;
    
-   /*
-    * 공지사항 페이지에서 기본적으로 페이징할 레코드 갯수(10)를 초기 파라미터를 통해 수신하여 정적 필드값으로 설정.
-    * 개별 DBMS DAO 에서 쿼리시 페이징 사이즈를 알아야 하므로 CommonModule 에서 통합하여 얻도록 설정.
-    */
    private static int pagingSizeValue = Integer.parseInt(
          ServletContextHolder.getServletContext().getInitParameter("pagingSizeValue")
    );
@@ -40,20 +37,19 @@ public abstract class CommonModule implements Dao {
       }
    }
    
-   // 공지사항 페이지에서 기본적으로 페이징할 레코드 갯수(10)를 상속 계층에서 얻기 위한 public 메서드 설정.
    public static int getPagingSizeValue() {
       return pagingSizeValue;
    }
-
-   public ArrayList<Notice> getNoticesDb(String selectSql, String searchWord) throws SQLException {
+   
+   public ArrayList<NoticeView> getNoticesDb(String selectSql, String searchWord) throws SQLException {
       try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
          preparedStatement.setString(1, "%" + searchWord + "%");
 
-         ArrayList<Notice> notices = new ArrayList<Notice>();
+         ArrayList<NoticeView> notices = new ArrayList<NoticeView>();
          try (ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-               Notice notice = new Notice();
+               NoticeView notice = new NoticeView();
 
                notice.setId(resultSet.getInt("id"));
                notice.setTitle(resultSet.getString("title"));
@@ -62,7 +58,9 @@ public abstract class CommonModule implements Dao {
                notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
                notice.setHit(resultSet.getInt("hit"));
                notice.setFiles(resultSet.getString("files"));
-
+               notice.setPub(resultSet.getBoolean("pub"));          // 결과집합에서 pub 컬럼 추출을 위한 추가 코드.
+               notice.setCmt_cnt(resultSet.getInt("cmt_cnt"));
+               
                notices.add(notice);
             }
          }
@@ -88,7 +86,7 @@ public abstract class CommonModule implements Dao {
    }
    
    
-   public Notice getCurrentNoticeDb(int id) throws SQLException {         // 메서드명 변경.
+   public Notice getCurrentNoticeDb(int id) throws SQLException {
       String selectSql = "SELECT * FROM notice WHERE id LIKE ?";
       
       try (Connection connection = dataSource.getConnection();
@@ -111,7 +109,40 @@ public abstract class CommonModule implements Dao {
          return notice;
       }
    }
-
+   
+   private Notice getPreNextNotice(String selectSql, int id, String searchWord) throws SQLException {
+      try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+         preparedStatement.setString(1, "%" + searchWord + "%");
+         preparedStatement.setInt(2, id);
+         
+         Notice notice = null;
+         try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if(resultSet.next()) {
+               notice = new Notice();
+               
+               notice.setId(resultSet.getInt("id"));
+               notice.setTitle(resultSet.getString("title"));
+               notice.setWriter_id(resultSet.getString("writer_id"));
+               notice.setContent(resultSet.getString("content"));
+               notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
+               notice.setHit(resultSet.getInt("hit"));
+               notice.setFiles(resultSet.getString("files"));
+            }
+         }
+         
+         return notice;
+      }
+   }
+   
+   public Notice getPrevNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
+      return getPreNextNotice(selectSql, id, searchWord);
+   }
+   
+   public Notice getNextNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
+      return getPreNextNotice(selectSql, id, searchWord);
+   }
+   
    public int setPubDb(String updateSql, String id) throws SQLException {
       try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {

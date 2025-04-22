@@ -9,7 +9,7 @@
 
 <head>
    <meta charset="UTF-8">
-   <title>전체 레코드수 조회를 위한 서비스와 DAO 계층 메서드 추가 및 그에 따른 View(list.jsp) 페이지 추가 구성 - 1</title>
+   <title>index.jsp 및 Index.java 구현</title>
    
    <link rel="stylesheet" href="/static/css/notice_list.css">
    
@@ -26,12 +26,22 @@
       }
       
       function changePageScope(page) {
-          location.href = "?pageNum=" + page;
+         const optionField = document.querySelector('.optionField') 
+         searchInput = document.querySelector('.searchInput');
+         
+          location.href = "?pageNum=" + page + '&searchField=' + optionField.value + '&searchWord=' + searchInput.value;
       }
    </script>
 </head>
 
 <body>
+   <!-- ================================================================================================================================= -->
+   <!-- 로고 링크 추가 -->
+   
+   <h1 id="logo"><a href="/">PSYLAB</a></h1>
+   
+   <!-- ================================================================================================================================= -->
+   
    <div id="body">
       <main class="main">
          <h2>공지사항</h2>
@@ -54,32 +64,38 @@
          <div>
             <h3 class="hidden">공지사항 목록</h3>
             <div class="table">
-               <div class="w60">번호</div>
-               <div class="expand">제목</div>
-               <div class="w100">작성자</div>
-               <div class="w100">작성일</div>
-               <div class="w60">조회수</div>
+               <div class="thead">번호</div>
+               <div class="thead">제목</div>
+               <div class="thead">작성자</div>
+               <div class="thead">작성일</div>
+               <div class="thead">조회수</div>
                
-               <c:forEach var="notice" items="${noticesModel}">
-                  <div>${notice.id}</div>
+               <c:forEach var="noticeView" items="${noticeViews}">
+                  <div>${noticeView.id}</div>
                   <div>
-                     <a href="detail/page?id=${notice.id}&pageNum=${pageNum}&searchField=${searchField}&searchWord=${searchWord}">${notice.title}</a></div>
-                  <div>${notice.writer_id}</div>
-                  <div>${notice.regDate}</div>
-                  <div class="colorRed">${notice.hit}</div>
+                     <a href="detail/page?id=${noticeView.id}&pageNum=${pageNum}&searchField=${searchField}&searchWord=${searchWord}">
+                     ${noticeView.title}
+                     <span class="colorRed">( ${noticeView.cmt_cnt} )</span>
+                     </a>
+                  </div>
+                  <div>${noticeView.writer_id}</div>
+                  <div>${noticeView.regDate}</div>
+                  <div class="colorRed">${noticeView.hit}</div>
                </c:forEach>
             </div>
          </div>
          <hr>
-         
-         <c:set var="wholePage" value="${ Math.ceil(noticeCnt / pagingSizeValue) }"/>
-         <c:set var="pageNationStartNum" value="${ pageNum - ( pageNum - 1 ) % pagenationSet }"/>  <!-- 링크 클릭에 의해 로드된 DB 페이지에 해당하는 페이지 네이션 시작 번호  -->
+            
+         <c:set var="wholePage" value="${ Math.ceil( noticeCnt / ( pagingSizeValue * pagenationSet ) ) }"/>
+         <c:set var="pageNationStartNum" value="${ pageNum - ( pageNum - 1 ) % pagenationSet }"/>
+         <c:set var="pageNationLastNum" value="${ Math.ceil( noticeCnt / pagingSizeValue ) }"/> 
+         <c:set var="currentPage" value="${ fn:substringBefore( Math.ceil( pageNationStartNum / pagenationSet ), '.' ) }"/>
          
          <div class="pageNationPart">
             <div>
                <h3 class="hidden">현재 페이지</h3>
                <div>
-                  <span>${ pageNum }</span> / ${fn:substringBefore(wholePage, '.')} pages
+                  <span>${ currentPage }</span> / <span class="colorRed">${fn:substringBefore(wholePage, '.')}</span> pages
                </div>
             </div>
 
@@ -87,26 +103,25 @@
                <ul>
                   <c:forEach var="i" begin="0" end="${pagenationSet - 1 }" >
                      <c:set var="printPageNum" value="${ pageNationStartNum + i }"/>
-                     <c:if test="${printPageNum <= wholePage }">
-                        <li><a href="?pageNum=${printPageNum}&searchField=${searchField}&searchWord=${searchWord}">${printPageNum}</a></li>
+                     <c:if test="${printPageNum <= pageNationLastNum}">
+                        <li ${ pageNum == printPageNum ? 'class = sellected' : '' }><a href="?pageNum=${printPageNum}&searchField=${searchField}&searchWord=${searchWord}">${printPageNum}</a></li>
                      </c:if>
                   </c:forEach>
                </ul>
                
                <div class="btn">
                   <c:choose>
-                     <c:when test="${pageNationStartNum > 1}">
-                        <button class="btn-prev" onclick = "changePageScope(${pageNationStartNum - 1})">이전</button>
+                     <c:when test="${currentPage > 1}">
+                        <button class="btn-prev" onclick = "changePageScope( ${pageNationStartNum - 1} )">이전</button>
                      </c:when>
                      <c:otherwise>
                         <button class="btn-prev" onclick="alert('이전 페이지가 없습니다.');">이전</button>
                      </c:otherwise>
                   </c:choose>
                   
-                  <c:set var="nextPageNationStartNum" value="${ pageNationStartNum + 5 }"/>
                   <c:choose>
-                     <c:when test="${nextPageNationStartNum <= pageNationLastNum }">
-                        <button class="btn-next" onclick="changePageScope(${nextPageNationStartNum})">다음</button>
+                     <c:when test="${ currentPage < wholePage }">
+                        <button class="btn-next" onclick="changePageScope( ${pageNationStartNum + 5 } )">다음</button>
                      </c:when>
                      <c:otherwise>
                         <button class="btn-next" onclick="alert('다음 페이지가 없습니다.');">다음</button>

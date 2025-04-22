@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import com.psy7758.context.ServletContextHolder;
 import com.psy7758.dao.CommonModule;
 import com.psy7758.dto.Notice;
+import com.psy7758.dto.view.notice.NoticeView;
 
 public class MysqlDao extends CommonModule {
    private static ServletContext context = ServletContextHolder.getServletContext();
@@ -23,8 +24,11 @@ public class MysqlDao extends CommonModule {
    }
    
    @Override
-   public ArrayList<Notice> getNotices(int pageNum, String searchField, String searchWord, boolean pub) throws SQLException {
-      String selectSql = String.format("SELECT * FROM NOTICE "
+   public ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord, boolean pub) throws SQLException {
+      /*
+       * 조회 대상 테이블을 기존 notice 에서 notice_view 로 변경.
+       */
+      String selectSql = String.format("SELECT * FROM notice_view "
             + "WHERE %s LIKE ? %s "
             + "ORDER BY REGDATE DESC "
             + "LIMIT %d, %d;",
@@ -48,9 +52,45 @@ public class MysqlDao extends CommonModule {
    }
    
    @Override
+   public Notice getPrevNotice(int id, String searchField, String searchWord, boolean pub) throws SQLException {
+      String selectSql = String.format("SELECT * FROM NOTICE "
+            + "WHERE %s %s LIKE ? "
+            + "AND REGDATE < (SELECT REGDATE FROM NOTICE WHERE ID = ?)"
+            + "ORDER BY REGDATE DESC "
+            + "LIMIT 1",
+            pub ? "" : "pub = 1 AND", searchField);
+      
+      return getPrevNoticeDb(selectSql, id, searchWord);
+   }
+
+   @Override
+   public Notice getNextNotice(int id, String searchField, String searchWord, boolean pub) throws SQLException {
+      String selectSql = String.format("SELECT * FROM NOTICE "
+            + "WHERE %s %s  LIKE ? "
+            + "AND REGDATE > (SELECT REGDATE FROM NOTICE WHERE ID = ?)"
+            + "LIMIT 1",
+            pub ? "" : "pub = 1 AND", searchField);
+      
+      return getNextNoticeDb(selectSql, id, searchWord);
+   }
+
+   @Override
    public int setPub(String id) throws SQLException {
       String updateSql = String.format("UPDATE client set pub = 1 WHERE id = ?");
       
       return setPubDb(updateSql, id);
    }
+
+@Override
+public void deleteNoticePub(String[] delId) throws SQLException {
+	String deleteSql = String.format("UPDATE client set pub = 0 WHERE id in(?)");
+	
+	deleteNoticePubDb(deleteSql, delId);
+}
+
+@Override
+public void updateNoticePub(String[] pubId) throws SQLException {
+	String updateSql = String.format("DELETE client set pub = 1 WHERE id in(?)");
+	updateNoticePubDb(updateSql, pubId);
+}
 }

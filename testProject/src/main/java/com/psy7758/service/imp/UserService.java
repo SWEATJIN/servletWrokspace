@@ -7,22 +7,26 @@ import com.psy7758.dao.Dao;
 import com.psy7758.dao.imp.MariaDao;
 import com.psy7758.dao.imp.MysqlDao;
 import com.psy7758.dto.Notice;
+import com.psy7758.dto.view.notice.NoticeView;
 import com.psy7758.service.Service;
 
 public class UserService implements Service{
 //   private Dao dao = new MysqlDao();
    private Dao dao = new MariaDao();
-
+   
+   /*
+    * getNotices 메서드에 대한 반환 타입을 ArrayList<Notice> 에서 ArrayList<NoticeView> 로 변경.
+    */
    @Override
-   public ArrayList<Notice> getNotices(int pageNum) {
+   public ArrayList<NoticeView> getNotices(int pageNum){
       return getNotices(pageNum, "id", "");
    }
    
    @Override
-   public ArrayList<Notice> getNotices(int pageNum, String searchField, String searchWord) {
-      ArrayList<Notice> notices = null;
+   public ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord) {
+      ArrayList<NoticeView> notices = null;
       try {
-         notices = dao.getNotices(pageNum, searchField, searchWord, true);
+         notices = dao.getNotices(pageNum, searchField, searchWord, false);
       } catch (SQLException e) {
          e.printStackTrace();
       }
@@ -49,7 +53,7 @@ public class UserService implements Service{
    }
    
    @Override
-   public Notice getCurrentNotice(int id) {   // 기존 getNotice 메서드를 getCurrentNotice 로 메서드명 변경.
+   public Notice getCurrentNotice(int id) {
       Notice notice = null;
       
       try {
@@ -61,16 +65,39 @@ public class UserService implements Service{
       return notice;
    }
 
-   // 관리자에게만 제공되는 기능 - 관리자에만 적용되는 확장 메서드. 
-   public int setPub(String id) {
-      int result = 0;
+   @Override
+   public Notice getPrevNotice(int id) {
+      return getPrevNotice(id, "id", "");
+   }
+
+   @Override
+   public Notice getPrevNotice(int id, String searchField, String searchWord) {
+      Notice notice = null;
       
       try {
-         result = dao.setPub(id);
+         notice = dao.getPrevNotice(id, searchField, searchWord, false);
       } catch (SQLException e) {
          e.printStackTrace();
       }
       
-      return result;
+      return notice;
+   }
+
+   @Override
+   public Notice getNextNotice(int id) {
+      return getNextNotice(id, "id", "");
+   }
+
+   @Override
+   public Notice getNextNotice(int id, String searchField, String searchWord) {
+      Notice notice = null;
+      
+      try {
+         notice = dao.getNextNotice(id, searchField, searchWord, false);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return notice;
    }
 }

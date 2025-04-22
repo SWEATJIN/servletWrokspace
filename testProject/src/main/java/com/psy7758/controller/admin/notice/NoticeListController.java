@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.psy7758.dto.Notice;
+import com.psy7758.dto.view.notice.NoticeView;
 import com.psy7758.service.imp.AdminService;
 
 @WebServlet("/admin/notice/list")
@@ -22,11 +22,9 @@ public class NoticeListController extends HttpServlet {
       String pageNum = request.getParameter("pageNum");
       String searchField = request.getParameter("searchField");
       String searchWord = request.getParameter("searchWord");
-      
       AdminService service = new AdminService();
       
-      // 변수를 활용한 호출 통합.
-      List<Notice> notices = null;
+      List<NoticeView> notices = null;   // 제네릭 기존 Notice 에서 NoticeView 로 변경.
       int noticeCnt = 0;
       
       if( searchWord == null ) {
@@ -44,12 +42,25 @@ public class NoticeListController extends HttpServlet {
       
       request.setAttribute("pagingSizeValue", getServletContext().getInitParameter("pagingSizeValue"));
       request.setAttribute("pagenationSet", getServletContext().getInitParameter("pagenationSet"));
-      request.setAttribute("noticesModel", notices);
+      request.setAttribute("noticeViews", notices);   // 속성명 변경.
       request.setAttribute("noticeCnt", noticeCnt);
       request.setAttribute("pageNum", pageNum);
       request.setAttribute("searchField", searchField);
       request.setAttribute("searchWord", searchWord);
       
       request.getRequestDispatcher("/WEB-INF/view/admin/notice/list.jsp").forward(request, response);
+   }
+   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	   String btnType= request.getParameter("submitBtn");
+	   String[] pubIds = request.getParameterValues("pubId");
+	   String[] delIds = request.getParameterValues("delId");
+	   AdminService service = new AdminService();
+	   if("batchPubBtn".equals(btnType)) {
+		   service.updateNoticePub(pubIds);
+	   }
+	   if("batchDelBtn".equals(btnType)) {
+		   service.deleteNoticePub(delIds);
+	   }
+	  doGet(request, response);
    }
 }

@@ -1,5 +1,6 @@
 * {
    list-style: none;
+   text-decoration: none;
 }
 
 .table {
@@ -10,8 +11,8 @@
 
 .colorRed {
    color: red;
+   font-weight: bold;
 }
-
 
 .pageNationPart {
    text-align: center;
@@ -29,4 +30,16 @@
 
 li {
    display: inline-block;
+}
+
+.sellected {
+   background-color: silver;
+   color: red;
+   font-weight: bold;
+   text-decoration: underline;
+}
+
+.thead {
+   background-color: silver;
+   font-weight: bold;
 }
