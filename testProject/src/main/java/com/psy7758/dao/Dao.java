@@ -7,10 +7,6 @@ import com.psy7758.dto.Notice;
 import com.psy7758.dto.view.notice.NoticeView;
 
 public interface Dao {
-
-	/*
-	 * getNotices 메서드에 대한 반환 타입을 ArrayList<Notice> 에서 ArrayList<NoticeView> 로 변경.
-	 */
 	// 검색 필드와 검색어 입력된 상태에서의 페이지 네이션 클릭시의 조회를 위한 메서드.
 	ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord, boolean pub)
 			throws SQLException;
@@ -28,10 +24,11 @@ public interface Dao {
 	// 공지사항 상세 페이지 조회시의 다음 페이지 조회를 위한 메서드(검색 목록 조회시).
 	Notice getNextNotice(int id, String searchField, String searchWord, boolean pub) throws SQLException;
 
-	int setPub(String id) throws SQLException;
+	// 관리자 메서드 - 공개 및 비공개 여부 설정. 파라미터 인수 목록 변경.
+	int setPub(int[] pubTrueId_, int[] pubFalseId_) throws SQLException;
 
-	void deleteNoticePub(String[] delId) throws SQLException;
+	// 관리자 메서드 - 공지 목록 삭제.
+	int delNotic(int[] delId) throws SQLException;
 
-	void updateNoticePub(String[] pubId) throws SQLException;
-
+	int insertNotice(Notice notice) throws SQLException;
 }

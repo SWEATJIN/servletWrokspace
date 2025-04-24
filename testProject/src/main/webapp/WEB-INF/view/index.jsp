@@ -16,6 +16,8 @@
        <nav id="main-menu">
             <h1>메인메뉴</h1>
             <ul>
+            
+                <li><a href="/admin/notice/list">관리자</a></li>
                 <li><a href="/user/notice/list">공지사항</a></li>
                 <li><a href="/user/login">로그인</a></li>
                 <li><a href="/user/createAccount">회원가입</a></li>

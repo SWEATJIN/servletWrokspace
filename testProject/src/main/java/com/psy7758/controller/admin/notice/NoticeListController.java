@@ -9,22 +9,71 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psy7758.dto.view.notice.NoticeView;
 import com.psy7758.service.imp.AdminService;
 
 @WebServlet("/admin/notice/list")
 public class NoticeListController extends HttpServlet {
    private static final long serialVersionUID = 1L;
+   private final AdminService service = new AdminService();
+   
+   public static class PubDelData {
+      private int[] pubTrueId_;
+      private int[] pubFalseId_;
+      private int[] delNotice;
+      private String pudDelBtn;
+      
+      public PubDelData() {}
 
+      public PubDelData(int[] pubTrueId_, int[] pubFalseId_, int[] delNotice, String pudDelBtn) {
+         this.pubTrueId_ = pubTrueId_;
+         this.pubFalseId_ = pubFalseId_;
+         this.delNotice = delNotice;
+         this.pudDelBtn = pudDelBtn;
+      }
+
+      public int[] getPubTrueId_() {
+         return pubTrueId_;
+      }
+
+      public void setPubTrueId_(int[] pubTrueId_) {
+         this.pubTrueId_ = pubTrueId_;
+      }
+
+      public int[] getPubFalseId_() {
+         return pubFalseId_;
+      }
+
+      public void setPubFalseId_(int[] pubFalseId_) {
+         this.pubFalseId_ = pubFalseId_;
+      }
+
+      public int[] getDelNotice() {
+         return delNotice;
+      }
+
+      public void setDelNotice(int[] delNotice) {
+         this.delNotice = delNotice;
+      }
+
+      public String getPudDelBtn() {
+         return pudDelBtn;
+      }
+
+      public void setPudDelBtn(String pudDelBtn) {
+         this.pudDelBtn = pudDelBtn;
+      }
+   }
+   
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       int defaultPageNum = 1;
       
       String pageNum = request.getParameter("pageNum");
       String searchField = request.getParameter("searchField");
       String searchWord = request.getParameter("searchWord");
-      AdminService service = new AdminService();
       
-      List<NoticeView> notices = null;   // 제네릭 기존 Notice 에서 NoticeView 로 변경.
+      List<NoticeView> notices = null;
       int noticeCnt = 0;
       
       if( searchWord == null ) {
@@ -42,7 +91,7 @@ public class NoticeListController extends HttpServlet {
       
       request.setAttribute("pagingSizeValue", getServletContext().getInitParameter("pagingSizeValue"));
       request.setAttribute("pagenationSet", getServletContext().getInitParameter("pagenationSet"));
-      request.setAttribute("noticeViews", notices);   // 속성명 변경.
+      request.setAttribute("noticeViews", notices);
       request.setAttribute("noticeCnt", noticeCnt);
       request.setAttribute("pageNum", pageNum);
       request.setAttribute("searchField", searchField);
@@ -50,17 +99,19 @@ public class NoticeListController extends HttpServlet {
       
       request.getRequestDispatcher("/WEB-INF/view/admin/notice/list.jsp").forward(request, response);
    }
+   
+   @Override
    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	   String btnType= request.getParameter("submitBtn");
-	   String[] pubIds = request.getParameterValues("pubId");
-	   String[] delIds = request.getParameterValues("delId");
-	   AdminService service = new AdminService();
-	   if("batchPubBtn".equals(btnType)) {
-		   service.updateNoticePub(pubIds);
-	   }
-	   if("batchDelBtn".equals(btnType)) {
-		   service.deleteNoticePub(delIds);
-	   }
-	  doGet(request, response);
+      PubDelData pubData = new ObjectMapper().readValue(request.getInputStream(), PubDelData.class);
+      
+      if( pubData.getPudDelBtn().equals("batchPubBtn") ) {
+         service.setPub(pubData.getPubTrueId_(), pubData.getPubFalseId_());
+      } else {
+         service.delNotice(pubData.getDelNotice());
+         
+         /*
+          * 프론트에서 Axios 를 이용한 AJAX 통신을 하므로, 서블릿에서 리디렉트 처리 불가.
+          */
+      }
    }
 }

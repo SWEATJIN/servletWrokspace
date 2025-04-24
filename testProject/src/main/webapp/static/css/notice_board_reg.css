@@ -1,0 +1,42 @@
+* {
+    list-style: none;
+}
+
+.table {
+    display: grid;
+
+    grid-template: repeat(2, 50px) 300px 50px / 2fr 7fr;
+    row-gap: 10px;
+}
+
+.table * {
+    border: 1px solid;
+    font-weight: bold;
+    
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+.table *:nth-child(odd) {
+    background-color: lime;
+}
+
+.table *:nth-child(even) {
+    justify-content: start;
+    text-indent: 10px;
+}
+
+.table *:nth-child(n + 7) {
+   border: none;
+    color: red;
+}
+
+.btn {
+   display: flex;
+    justify-content: center;
+}
+
+.hidden {
+   display: none;
+}

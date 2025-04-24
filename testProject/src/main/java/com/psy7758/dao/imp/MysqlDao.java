@@ -25,9 +25,6 @@ public class MysqlDao extends CommonModule {
    
    @Override
    public ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord, boolean pub) throws SQLException {
-      /*
-       * 조회 대상 테이블을 기존 notice 에서 notice_view 로 변경.
-       */
       String selectSql = String.format("SELECT * FROM notice_view "
             + "WHERE %s LIKE ? %s "
             + "ORDER BY REGDATE DESC "
@@ -75,22 +72,30 @@ public class MysqlDao extends CommonModule {
    }
 
    @Override
-   public int setPub(String id) throws SQLException {
-      String updateSql = String.format("UPDATE client set pub = 1 WHERE id = ?");
+   public int setPub(int[] pubTrueId_, int[] pubFalseId_) throws SQLException {
+      String placeholders1 = String.join( ",", "?".repeat(pubTrueId_.length).split("") ),
+       placeholders2 = String.join( ",", "?".repeat(pubFalseId_.length).split("") );
       
-      return setPubDb(updateSql, id);
+      String pubSql = String.format("UPDATE notice set pub = 1 WHERE id in(%s)", placeholders1),
+      nonePubSql = String.format("UPDATE notice set pub = 0 WHERE id in(%s)", placeholders2);
+      
+      return setPubDb(pubSql, nonePubSql ,pubTrueId_, pubFalseId_);
+   }
+
+   @Override
+   public int delNotic(int[] delId) throws SQLException {
+      String placeholders = String.join( ",", "?".repeat(delId.length).split("") );
+      
+      // 오라클과 달리 MySQL 과 마리아는 FROM 생략 불가함에 주의.
+      String delSql = String.format("DELETE FROM NOTICE WHERE id in(%s)", placeholders);
+      
+      return delNoticeDb(delSql, delId);
    }
 
 @Override
-public void deleteNoticePub(String[] delId) throws SQLException {
-	String deleteSql = String.format("UPDATE client set pub = 0 WHERE id in(?)");
-	
-	deleteNoticePubDb(deleteSql, delId);
-}
-
-@Override
-public void updateNoticePub(String[] pubId) throws SQLException {
-	String updateSql = String.format("DELETE client set pub = 1 WHERE id in(?)");
-	updateNoticePubDb(updateSql, pubId);
+public int insertNotice(Notice notice) throws SQLException {
+	String insertSql = "INSERT INTO notice (TITLE, WRITER_ID, CONTENT, REGDATE, HIT, FILES,pub) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+	return insertNoticeDb(insertSql, notice);
 }
 }

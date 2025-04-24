@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
@@ -15,142 +16,203 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class CommonModule implements Dao {
-   private static final HikariConfig config = new HikariConfig();
-   private static HikariDataSource dataSource;
-   
-   private static int pagingSizeValue = Integer.parseInt(
-         ServletContextHolder.getServletContext().getInitParameter("pagingSizeValue")
-   );
+	private static final HikariConfig config = new HikariConfig();
+	private static HikariDataSource dataSource;
 
-   public CommonModule(ServletContext context, String driver, String url, String user_name, String psw) {
-      synchronized (CommonModule.class) {
-         if (dataSource == null) {
-            config.setDriverClassName(driver);
-            config.setJdbcUrl(url);
-            config.setUsername(user_name);
-            config.setPassword(psw);
-            dataSource = new HikariDataSource(config);
+	private static int pagingSizeValue = Integer
+			.parseInt(ServletContextHolder.getServletContext().getInitParameter("pagingSizeValue"));
 
-            context.setAttribute("dataSource", dataSource);
-            context.setAttribute("closedJdbcUrl", url);
-         }
-      }
-   }
-   
-   public static int getPagingSizeValue() {
-      return pagingSizeValue;
-   }
-   
-   public ArrayList<NoticeView> getNoticesDb(String selectSql, String searchWord) throws SQLException {
-      try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
-         preparedStatement.setString(1, "%" + searchWord + "%");
+	public CommonModule(ServletContext context, String driver, String url, String user_name, String psw) {
+		synchronized (CommonModule.class) {
+			if (dataSource == null) {
+				config.setDriverClassName(driver);
+				config.setJdbcUrl(url);
+				config.setUsername(user_name);
+				config.setPassword(psw);
+				dataSource = new HikariDataSource(config);
 
-         ArrayList<NoticeView> notices = new ArrayList<NoticeView>();
-         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-               NoticeView notice = new NoticeView();
+				context.setAttribute("dataSource", dataSource);
+				context.setAttribute("closedJdbcUrl", url);
+			}
+		}
+	}
 
-               notice.setId(resultSet.getInt("id"));
-               notice.setTitle(resultSet.getString("title"));
-               notice.setWriter_id(resultSet.getString("writer_id"));
-               notice.setContent(resultSet.getString("content"));
-               notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
-               notice.setHit(resultSet.getInt("hit"));
-               notice.setFiles(resultSet.getString("files"));
-               notice.setPub(resultSet.getBoolean("pub"));          // 결과집합에서 pub 컬럼 추출을 위한 추가 코드.
-               notice.setCmt_cnt(resultSet.getInt("cmt_cnt"));
-               
-               notices.add(notice);
-            }
-         }
+	public static int getPagingSizeValue() {
+		return pagingSizeValue;
+	}
 
-         return notices;
-      }
-   }
-   
-   public int getNoticeCntDb(String selectSql, String searchWord) throws SQLException {
-      try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
-         preparedStatement.setString(1, "%" + searchWord + "%");
-         
-         int selectCnt = 0;
-         
-         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-               resultSet.next();
-               selectCnt = resultSet.getInt("cnt");
-         }
+	public ArrayList<NoticeView> getNoticesDb(String selectSql, String searchWord) throws SQLException {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setString(1, "%" + searchWord + "%");
 
-         return selectCnt;
-      }
-   }
-   
-   
-   public Notice getCurrentNoticeDb(int id) throws SQLException {
-      String selectSql = "SELECT * FROM notice WHERE id LIKE ?";
-      
-      try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
-         preparedStatement.setInt(1, id);
+			ArrayList<NoticeView> notices = new ArrayList<NoticeView>();
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					NoticeView notice = new NoticeView();
 
-         Notice notice = new Notice();
-         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            resultSet.next();
-            
-            notice.setId(resultSet.getInt("id"));
-            notice.setTitle(resultSet.getString("title"));
-            notice.setWriter_id(resultSet.getString("writer_id"));
-            notice.setContent(resultSet.getString("content"));
-            notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
-            notice.setHit(resultSet.getInt("hit"));
-            notice.setFiles(resultSet.getString("files"));
-         }
+					notice.setId(resultSet.getInt("id"));
+					notice.setTitle(resultSet.getString("title"));
+					notice.setWriter_id(resultSet.getString("writer_id"));
+					notice.setContent(resultSet.getString("content"));
+					notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
+					notice.setHit(resultSet.getInt("hit"));
+					notice.setFiles(resultSet.getString("files"));
+					notice.setPub(resultSet.getBoolean("pub"));
+					notice.setCmt_cnt(resultSet.getInt("cmt_cnt"));
 
-         return notice;
-      }
-   }
-   
-   private Notice getPreNextNotice(String selectSql, int id, String searchWord) throws SQLException {
-      try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
-         preparedStatement.setString(1, "%" + searchWord + "%");
-         preparedStatement.setInt(2, id);
-         
-         Notice notice = null;
-         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if(resultSet.next()) {
-               notice = new Notice();
-               
-               notice.setId(resultSet.getInt("id"));
-               notice.setTitle(resultSet.getString("title"));
-               notice.setWriter_id(resultSet.getString("writer_id"));
-               notice.setContent(resultSet.getString("content"));
-               notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
-               notice.setHit(resultSet.getInt("hit"));
-               notice.setFiles(resultSet.getString("files"));
-            }
-         }
-         
-         return notice;
-      }
-   }
-   
-   public Notice getPrevNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
-      return getPreNextNotice(selectSql, id, searchWord);
-   }
-   
-   public Notice getNextNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
-      return getPreNextNotice(selectSql, id, searchWord);
-   }
-   
-   public int setPubDb(String updateSql, String id) throws SQLException {
-      try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
-         preparedStatement.setString(1, id);
-         
-         int row = preparedStatement.executeUpdate();
+					notices.add(notice);
+				}
+			}
 
-         return row;
-      }
-   }
+			return notices;
+		}
+	}
+
+	public int getNoticeCntDb(String selectSql, String searchWord) throws SQLException {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setString(1, "%" + searchWord + "%");
+
+			int selectCnt = 0;
+
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				resultSet.next();
+				selectCnt = resultSet.getInt("cnt");
+			}
+
+			return selectCnt;
+		}
+	}
+
+	public Notice getCurrentNoticeDb(int id) throws SQLException {
+		String selectSql = "SELECT * FROM notice WHERE id LIKE ?";
+
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setInt(1, id);
+
+			Notice notice = new Notice();
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				resultSet.next();
+
+				notice.setId(resultSet.getInt("id"));
+				notice.setTitle(resultSet.getString("title"));
+				notice.setWriter_id(resultSet.getString("writer_id"));
+				notice.setContent(resultSet.getString("content"));
+				notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
+				notice.setHit(resultSet.getInt("hit"));
+				notice.setFiles(resultSet.getString("files"));
+			}
+
+			return notice;
+		}
+	}
+
+	private Notice getPreNextNotice(String selectSql, int id, String searchWord) throws SQLException {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+			preparedStatement.setString(1, "%" + searchWord + "%");
+			preparedStatement.setInt(2, id);
+
+			Notice notice = null;
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					notice = new Notice();
+
+					notice.setId(resultSet.getInt("id"));
+					notice.setTitle(resultSet.getString("title"));
+					notice.setWriter_id(resultSet.getString("writer_id"));
+					notice.setContent(resultSet.getString("content"));
+					notice.setRegDate(resultSet.getTimestamp("regDate").toLocalDateTime());
+					notice.setHit(resultSet.getInt("hit"));
+					notice.setFiles(resultSet.getString("files"));
+				}
+			}
+
+			return notice;
+		}
+	}
+
+	public Notice getPrevNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
+		return getPreNextNotice(selectSql, id, searchWord);
+	}
+
+	public Notice getNextNoticeDb(String selectSql, int id, String searchWord) throws SQLException {
+		return getPreNextNotice(selectSql, id, searchWord);
+	}
+
+	public int setPubDb(String pubSql, String nonePubSql, int[] pubTrueId_, int[] pubFalseId_) throws SQLException {
+		try (Connection connection = dataSource.getConnection()) {
+			int row = 0;
+
+			connection.setAutoCommit(false);
+
+			try {
+				if (pubTrueId_.length != 0) {
+					try (PreparedStatement preparedStatement = connection.prepareStatement(pubSql)) {
+						for (int i = 0; i < pubTrueId_.length; i++) {
+							preparedStatement.setInt(i + 1, pubTrueId_[i]);
+						}
+
+						row = preparedStatement.executeUpdate();
+					}
+				}
+
+				if (pubFalseId_.length != 0) {
+					try (PreparedStatement preparedStatement = connection.prepareStatement(nonePubSql)) {
+						for (int i = 0; i < pubFalseId_.length; i++) {
+							preparedStatement.setInt(i + 1, pubFalseId_[i]);
+						}
+
+						row += preparedStatement.executeUpdate();
+					}
+				}
+
+				connection.commit();
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				connection.rollback();
+			}
+
+			return row;
+		}
+	}
+
+	public int delNoticeDb(String delSql, int[] delId) throws SQLException {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(delSql)) {
+			int row = 0;
+
+			if (delId.length != 0) {
+				for (int i = 0; i < delId.length; i++) {
+					preparedStatement.setInt(i + 1, delId[i]);
+				}
+
+				row = preparedStatement.executeUpdate();
+			}
+
+			return row;
+		}
+	}
+
+	public int insertNoticeDb(String insertSql, Notice notice) throws SQLException {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement pstm = connection.prepareStatement(insertSql)) {
+			int row = 0;
+			pstm.setString(1, notice.getTitle());
+			pstm.setString(2, notice.getWriter_id());
+			pstm.setString(3, notice.getContent());
+			pstm.setTimestamp(4, Timestamp.valueOf(notice.getRegDate()));
+			pstm.setInt(5, notice.getHit());
+			pstm.setString(6, notice.getFiles());
+			pstm.setBoolean(7, notice.getPub());
+
+			row = pstm.executeUpdate();
+
+			return row;
+		}
+
+	}
 }
