@@ -20,8 +20,8 @@ public class CharSetServletFilter implements Filter {
       String path = ((HttpServletRequest) request).getServletPath();
 
       try {
-         // 정적 리소스 (CSS, JS, 이미지 등)에 대해서만 컨텐트 지정이 되지 않도록 선제적 설정.
-         if (path.startsWith("/static/")) {
+         // 루트의 upload 폴더도 컨텐트 지정이 되지 않도록 설정 추가.
+         if (path.startsWith("/static/") || path.startsWith("/upload") ) {
             return;
          }
          

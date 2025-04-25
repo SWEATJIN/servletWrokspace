@@ -85,17 +85,15 @@ public class MysqlDao extends CommonModule {
    @Override
    public int delNotic(int[] delId) throws SQLException {
       String placeholders = String.join( ",", "?".repeat(delId.length).split("") );
-      
-      // 오라클과 달리 MySQL 과 마리아는 FROM 생략 불가함에 주의.
       String delSql = String.format("DELETE FROM NOTICE WHERE id in(%s)", placeholders);
       
       return delNoticeDb(delSql, delId);
    }
 
-@Override
-public int insertNotice(Notice notice) throws SQLException {
-	String insertSql = "INSERT INTO notice (TITLE, WRITER_ID, CONTENT, REGDATE, HIT, FILES,pub) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
-	return insertNoticeDb(insertSql, notice);
-}
+   @Override
+   public int regNotice(Notice notice) throws SQLException {
+      String insertSql = "INSERT INTO NOTICE(TITLE, WRITER_ID, FILES, CONTENT, PUB) VALUES(?, ?, ?, ?, ?)";
+      
+      return regNoticeDb(insertSql, notice);
+   }
 }

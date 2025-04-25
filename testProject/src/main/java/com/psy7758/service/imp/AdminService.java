@@ -11,132 +11,131 @@ import com.psy7758.dto.Notice;
 import com.psy7758.dto.view.notice.NoticeView;
 import com.psy7758.service.Service;
 
-public class AdminService implements Service {
-//	private Dao dao = new MysqlDao();
+public class AdminService implements Service{
+//   private Dao dao = new OracleDao();
+//   private Dao dao = new MysqlDao();
    private Dao dao = new MariaDao();
+   
+   @Override
+   public ArrayList<NoticeView> getNotices(int pageNum) {
+      return getNotices(pageNum, "id", "");
+   }
+   
+   @Override
+   public ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord) {
+      ArrayList<NoticeView> notices = null;
+      try {
+         notices = dao.getNotices(pageNum, searchField, searchWord, true);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return notices;
+   }
+   
+   @Override
+   public int getNoticeCnt() {
+      return getNoticeCnt("id", "");
+   }
+   
+   @Override
+   public int getNoticeCnt(String searchField, String searchWord) {
+      int noticeCnt = 0;
+      
+      try {
+         noticeCnt = dao.getNoticeCnt(searchField, searchWord, true);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      
+      return noticeCnt;
+   }
+   
+   @Override
+   public Notice getCurrentNotice(int id) {
+      Notice notice = null;
+      
+      try {
+         notice = dao.getCurrentNotice(id);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return notice;
+   }
+   
+   @Override
+   public Notice getPrevNotice(int id) {
+      return getPrevNotice(id, "id", "");
+   }
 
-	@Override
-	public ArrayList<NoticeView> getNotices(int pageNum) {
-		return getNotices(pageNum, "id", "");
-	}
+   @Override
+   public Notice getPrevNotice(int id, String searchField, String searchWord) {
+      Notice notice = null;
+      
+      try {
+         notice = dao.getPrevNotice(id, searchField, searchWord, true);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return notice;
+   }
 
-	@Override
-	public ArrayList<NoticeView> getNotices(int pageNum, String searchField, String searchWord) {
-		ArrayList<NoticeView> notices = null;
-		try {
-			notices = dao.getNotices(pageNum, searchField, searchWord, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+   @Override
+   public Notice getNextNotice(int id) {
+      return getNextNotice(id, "id", "");
+   }
 
-		return notices;
-	}
+   @Override
+   public Notice getNextNotice(int id, String searchField, String searchWord) {
+      Notice notice = null;
+      
+      try {
+         notice = dao.getNextNotice(id, searchField, searchWord, true);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return notice;
+   }
 
-	@Override
-	public int getNoticeCnt() {
-		return getNoticeCnt("id", "");
-	}
-
-	@Override
-	public int getNoticeCnt(String searchField, String searchWord) {
-		int noticeCnt = 0;
-
-		try {
-			noticeCnt = dao.getNoticeCnt(searchField, searchWord, true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return noticeCnt;
-	}
-
-	@Override
-	public Notice getCurrentNotice(int id) {
-		Notice notice = null;
-
-		try {
-			notice = dao.getCurrentNotice(id);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return notice;
-	}
-
-	@Override
-	public Notice getPrevNotice(int id) {
-		return getPrevNotice(id, "id", "");
-	}
-
-	@Override
-	public Notice getPrevNotice(int id, String searchField, String searchWord) {
-		Notice notice = null;
-
-		try {
-			notice = dao.getPrevNotice(id, searchField, searchWord, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return notice;
-	}
-
-	@Override
-	public Notice getNextNotice(int id) {
-		return getNextNotice(id, "id", "");
-	}
-
-	@Override
-	public Notice getNextNotice(int id, String searchField, String searchWord) {
-		Notice notice = null;
-
-		try {
-			notice = dao.getNextNotice(id, searchField, searchWord, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return notice;
-	}
-
-	// 관리자 메서드 - 공개 및 비공개 여부 설정.
-	public int setPub(int[] pubTrueId_, int[] pubFalseId_) {
-		int result = 0;
-
-		try {
-			result = dao.setPub(pubTrueId_, pubFalseId_);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-
-	// 관리자 메서드 - 체크된 공지 목록 삭제.
-	public int delNotice(int[] delId) {
-		int result = 0;
-
-		try {
-			result = dao.delNotic(delId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-
-	public int insertNotice(Notice notice) {
-		int notice_ = 0;
-		System.out.println(notice);
-		System.out.println(notice_);
-		try {
-			notice_ = dao.insertNotice(notice);
-			System.out.println(notice_);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return notice_;
-
-	}
+   // 관리자 메서드 - 공개 및 비공개 여부 설정. 
+   public int setPub(int[] pubTrueId_, int[] pubFalseId_) {
+      int result = 0;
+      
+      try {
+         result = dao.setPub(pubTrueId_, pubFalseId_);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return result;
+   }
+   
+   // 관리자 메서드 - 체크된 공지 목록 추라. 
+   public int delNotice(int[] delId) {
+      int result = 0;
+      
+      try {
+         result = dao.delNotic(delId);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return result;
+   }
+   
+   // 관리자 메서드 - 공지 목록 등록. 
+   public int regNotice(Notice notice) {
+      int result = 0;
+      
+      try {
+         result = dao.regNotice(notice);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      
+      return result;
+   }
 }

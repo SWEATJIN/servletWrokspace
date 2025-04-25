@@ -9,15 +9,12 @@
 
 <head>
    <meta charset="UTF-8">
-   <title>index.jsp 및 Index.java 구현</title>
+   <title>page.jsp 에서의 컨텐트에 HTML 인젝션을 통한 html 문서 및 이미지 포함하기와 이를 방어하기 위한 escapeXml 함수를 통한 HTML 이스케이핑</title>
    
    <link rel="stylesheet" href="/static/css/notice_detail_page.css">
 </head>
 
 <body>
-   <!-- ================================================================================================================================= -->
-   <!-- 로고 링크 추가 -->
-   
    <h1 id="logo"><a href="/">PSYLAB</a></h1>
    
    <!-- ================================================================================================================================= -->
@@ -39,13 +36,13 @@
                <div>첨부파일</div>
                <div class="attachedfilesList">
                   <c:forTokens var="file" items="${noticeModel.files}" delims="," varStatus="status">
-                          <a href="${file}">
-                              ${fn:endsWith(file, 'gif' ) ? fn:toUpperCase(file) : file}
-                          </a>
+                     <a href="/upload/${file}">
+                        ${fn:endsWith(file, 'gif') ? fn:toUpperCase(file) : file}
+                     </a>
                           ${status.last ? '' : '/ '}
                        </c:forTokens>
                </div>
-               <div>${noticeModel.content}</div>
+               <div>${ fn:escapeXml(noticeModel.content) }</div>      <!-- escapeXml 추가 -->
             </div>
          </div>
          

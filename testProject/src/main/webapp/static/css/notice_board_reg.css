@@ -4,8 +4,9 @@
 
 .table {
     display: grid;
-
-    grid-template: repeat(2, 50px) 300px 50px / 2fr 7fr;
+   
+   /* 행 추가 */
+    grid-template: repeat(4, 50px) 300px 30px / 2fr 7fr;
     row-gap: 10px;
 }
 
@@ -27,9 +28,11 @@
     text-indent: 10px;
 }
 
-.table *:nth-child(n + 7) {
+/* 행추가로 인한 nth-child 연산식 변경 */
+.table *:nth-child(n + 11), .limitMsg {
    border: none;
     color: red;
+    font-weight: bold;
 }
 
 .btn {

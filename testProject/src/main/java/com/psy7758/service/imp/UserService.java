@@ -11,8 +11,8 @@ import com.psy7758.dto.view.notice.NoticeView;
 import com.psy7758.service.Service;
 
 public class UserService implements Service{
-//   private Dao dao = new MysqlDao();
-   private Dao dao = new MariaDao();
+   private Dao dao = new MysqlDao();
+//   private Dao dao = new MariaDao();
    
    /*
     * getNotices 메서드에 대한 반환 타입을 ArrayList<Notice> 에서 ArrayList<NoticeView> 로 변경.

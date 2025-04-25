@@ -16,13 +16,6 @@
     <link rel="stylesheet" href="/static/css/notice_list_admin.css">
 
     <script type="text/javascript">
-    function board(self){
-    	
-           const pageNum = "${pageNum}";
-            const searchField = "${searchField}";
-            const searchWord = "${searchWord}";
-            location.href = '/admin/notice/board/register?pageNum=' + pageNum + '&searchField=' + searchField + '&searchWord=' + searchWord;
-    }
         function search() {
             const optionField = document.querySelector('.optionField')
             searchInput = document.querySelector('.searchInput');
@@ -66,7 +59,6 @@
             }
         }
         
-        // 일괄삭제 메서드 추가.
         async function removeNotice(self) {
             const delId = document.getElementsByClassName('delId');
             const delNotice = [];
@@ -79,23 +71,26 @@
             
             const pubDelData = {
                   delNotice,
-                  pudDelBtn : self.value,
+                   pudDelBtn : self.value,
             };
 
              try {
                 const response = await axios.post('/admin/notice/list', pubDelData);
                 
-                /*
-                   AJAX 통신 특성상 서블릿(NoticeListController)에서 DB 데이터 삭제후 리디렉션 처리가 불가하므로,
-                   프론트단에서 리디렉션(get) 요청 처러.
-                   
-                   데이터 삭제후 현재 페이지(페이지 네이션)를 유지하기 위해, 쿼리스트링을 포함한 URL 을 그대로 보존해야하므로
-                   아래와같이 현재 URL 값을 읽어 location.href 에 할당.
-                */
                 location.href = location.href;
             } catch (error) {
                 console.log(error);
             }
+        }
+        
+        // 글쓰기 메서드 추가.
+        function regNotice() {
+           
+          /*
+             JSP 내부 스크립트 내에서는 아래와같이 EL 표현식이 정상적으로 인식.
+             하지만 외부 스크립트 내에서는 EL 표현식이 정상적으로 인식되지 않음에 주의.
+          */
+           location.href = `board/reg?pageNum=${pageNum}&searchField=${searchField}&searchWord=${searchWord}`;
         }
     </script>
 </head>
@@ -153,8 +148,8 @@
 
                 <div class="dataControlBtn">
                     <button value="batchPubBtn" onclick="transPub(this)">일괄공개</button>
-                    <button value="batchDelBtn" onclick="removeNotice(this)">일괄삭제</button>      <!-- 호출 함수명 수정 -->
-                    <button class="writeBtn" onclick="board(this);">글쓰기</button>
+                    <button value="batchDelBtn" onclick="removeNotice(this)">일괄삭제</button>   
+                    <button class="writeBtn" onclick="regNotice()">글쓰기</button>            <!-- onclick 이벤트 추가 -->
                 </div>
             </div>
             <hr>
