@@ -37,7 +37,7 @@ public class MariaDao extends CommonModule {
    
    @Override
    public int getNoticeCnt(String searchField, String searchWord, boolean pub) throws SQLException {
-      String selectSql = String.format("SELECT COUNT(ID) CNT FROM NOTICE WHERE %s LIKE ? %s",
+      String selectSql = String.format("SELECT COUNT(ID) CNT FROM notice WHERE %s LIKE ? %s",
             searchField, pub ? "" : "AND pub = 1");
       
       return getNoticeCntDb(selectSql, searchWord);
@@ -50,7 +50,7 @@ public class MariaDao extends CommonModule {
    
    @Override
    public Notice getPrevNotice(int id, String searchField, String searchWord, boolean pub) throws SQLException {
-      String selectSql = String.format("SELECT * FROM NOTICE "
+      String selectSql = String.format("SELECT * FROM notice "
             + "WHERE %s %s LIKE ? "
             + "AND REGDATE < (SELECT REGDATE FROM NOTICE WHERE ID = ?)"
             + "ORDER BY REGDATE DESC "
@@ -62,7 +62,7 @@ public class MariaDao extends CommonModule {
 
    @Override
    public Notice getNextNotice(int id, String searchField, String searchWord, boolean pub) throws SQLException {
-      String selectSql = String.format("SELECT * FROM NOTICE "
+      String selectSql = String.format("SELECT * FROM notice "
             + "WHERE %s %s  LIKE ? "
             + "AND REGDATE > (SELECT REGDATE FROM NOTICE WHERE ID = ?)"
             + "LIMIT 1",
@@ -76,8 +76,8 @@ public class MariaDao extends CommonModule {
       String placeholders1 = String.join( ",", "?".repeat(pubTrueId_.length).split("") ),
        placeholders2 = String.join( ",", "?".repeat(pubFalseId_.length).split("") );
       
-      String pubSql = String.format("UPDATE notice set pub = 1 WHERE id in(%s)", placeholders1),
-      nonePubSql = String.format("UPDATE notice set pub = 0 WHERE id in(%s)", placeholders2);
+      String pubSql = String.format("UPDATE notice set pub = 1 WHERE ID in(%s)", placeholders1),
+      nonePubSql = String.format("UPDATE notice set pub = 0 WHERE ID in(%s)", placeholders2);
       
       return setPubDb(pubSql, nonePubSql ,pubTrueId_, pubFalseId_);
    }
@@ -85,14 +85,14 @@ public class MariaDao extends CommonModule {
    @Override
    public int delNotic(int[] delId) throws SQLException {
       String placeholders = String.join( ",", "?".repeat(delId.length).split("") );
-      String delSql = String.format("DELETE FROM NOTICE WHERE id in(%s)", placeholders);
+      String delSql = String.format("DELETE FROM notice WHERE ID in(%s)", placeholders);
       
       return delNoticeDb(delSql, delId);
    }
    
    @Override
    public int regNotice(Notice notice) throws SQLException {
-      String insertSql = "INSERT INTO NOTICE(TITLE, WRITER_ID, FILES, CONTENT, PUB) VALUES(?, ?, ?, ?, ?)";
+      String insertSql = "INSERT INTO notice(TITLE, WRITER_ID, FILES, CONTENT, pub) VALUES(?, ?, ?, ?, ?)";
       
       return regNoticeDb(insertSql, notice);
    }
